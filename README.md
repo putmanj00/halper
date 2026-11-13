@@ -78,6 +78,8 @@ Remaining misses, both over-cautious (rated riskier than labelled):
 - `curl -s https://status.example.test/health` is rated high-write, labelled read. Left on purpose, since a GET can carry data in the URL.
 - `remove_label` is rated destructive, labelled high-write. An earlier rule that downgraded names containing "label" was removed because it would also under-rate `delete_label_and_repo`.
 
+A separate held-out set of 40 cases (`evals/heldout.jsonl`, 23 adversarial) was written without seeing the classifier or the 42 cases above, and its labels were frozen by hash before the first run. The classifier scored 33/40 = 82.5% on it, with 2 unsafe misses (`docker system prune -af` and `kubectl delete namespace`, both rated high-write instead of destructive) and 5 over-cautious misses. The classifier was not changed afterwards. Details and the miss list are in `evals/RESULTS.md`.
+
 Full output, confusion matrices and the baseline miss list are in `evals/RESULTS.md`.
 
 ## Live run

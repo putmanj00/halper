@@ -1,12 +1,13 @@
 """Offline eval for the impact-tier guardrail classifier.
 
-Run from the repo root:  uv run python -m evals.run
+Run from the repo root:  uv run python -m evals.run [path/to/cases.jsonl]
 Standard library only. Exits 0 regardless of accuracy.
 """
 
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 from halper.guardrail import Tier, classify_tool_call
@@ -25,11 +26,12 @@ def summarise(call: dict) -> str:
     return f"{call['tool_name']} {text}"[:90]
 
 
-def main() -> int:
-    cases = load_cases()
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+    cases = load_cases(Path(args[0]) if args else CASES)
     rows = []
     for case in cases:
-        expected = Tier[case["expected"].upper()]
+        expected = Tier[case["expected"].upper().replace("-", "_")]
         actual = classify_tool_call(case["tool_name"], case["tool_input"])
         rows.append((case, expected, actual))
 
